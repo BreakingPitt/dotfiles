@@ -1,0 +1,26 @@
+# Deactivate the startup message of screen
+startup_message off
+
+# Deactivate the bell ring sound
+vbell off
+
+# Bind keys for moving around windows
+bind l focus right
+bind h focus left
+bind k focus up
+bind j focus down
+
+# Bind keys activating/deactivating hardstatus line
+bind f eval "hardstatus ignore"
+bind F eval "hardstatus alwayslastline"
+
+# Setup hardstatus
+hardstatus off
+hardstatus alwayslastline
+hardstatus string "%{b kw}%H %{r}%1` %{w}| %{g}%c %{w}| %{y}%d.%m.%Y %{w}| %{g}%l %{w}| %{-b kw}%u %-Lw%{= rW}%50> %n%f %t %{-}%+Lw%<"
+
+# Fix for residual editor text
+altscreen on
+
+# Indicate 256 color screen
+term screen-256color
