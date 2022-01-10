@@ -1,0 +1,16 @@
+MASTER]
+# Ignore Python code in VCS metadata
+ignore=CVS,.bzr,.svn,.git
+
+[MESSAGES CONTROL]
+# Disable the message(s) with the given id(s).
+# W0142: Used * ordd ** magic
+# W0511: Warning notes in code comments
+# C0111: Missing docstring
+disable=W0142,W0511,C0111
+
+[REPORTS]
+output-format=colorized
+
+[FORMAT]
+max-line-length=79
