@@ -1,0 +1,45 @@
+[column]
+	ui = auto,column
+
+[commit]
+	gpgsign = true
+	status = true
+
+[core]
+        editor = vim
+        whitespace = fix,trailing-space,cr-at-eol
+        hooksPath = ~/.config/git/hooks
+        commitGraph = true
+
+[credential]
+	helper = cache --timeout=7200
+
+[diff]
+        algorithm = myers
+	tool = vimdiff
+	colorMoved = default
+	renames = copy
+	mnemonicPrefix = true
+	wsErrorHighlight = all
+	statGraphWidth = 40
+
+[init]
+	defaultBranch = main
+
+[status]
+	short = true
+	branch = true
+	showStash = true
+	submoduleSummary = true
+	renames = copy
+
+[url "https://github"]
+  insteadOf = git://github
+
+[user]
+        name = Pedro Garcia Rodriguez
+        email = pedgarrod@gmail.com
+        signingkey = pedgarrod@gmail.com
+
+[web]
+	browser = brave
