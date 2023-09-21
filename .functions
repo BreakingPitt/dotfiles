@@ -1,0 +1,105 @@
+_display_error() {
+  local message="$1"
+  echo -e "\e[91mERROR:\e[0m $message"
+}
+
+# Create a new directory and enter it
+mk_dir() {
+  # mk_dir: Create a directory and change to it.
+  #
+  # This function creates a directory with 'mkdir -p' and then changes to it using 'cd'.
+  # It checks if the directory creation was successful before attempting to change to it.
+  #
+  # Usage:
+  #   - mk_dir directory_path
+  #
+  # Parameters:
+  #   directory_path: The path to the directory to be created and changed to.
+  #
+
+  local DIRECTORY_PATH="$1"
+
+  if mkdir -p "$DIRECTORY_PATH"; then
+    cd "$DIRECTORY_PATH" || return 1
+  else
+    return 1
+  fi
+}
+
+
+# Make a temporary directory and enter it
+mk_tempd() {
+  # mk_tempd: Create a temporary directory and change the current working directory to it.
+  #
+  # This function generates a temporary directory using 'mktemp' and optionally
+  # appends a provided prefix to the directory name. It then changes the current
+  # working directory to the newly created directory.
+  #
+  # Usage:
+  #   - Without arguments: Create a temporary directory with a random name.
+  #   - With a prefix argument: Create a temporary directory with the given prefix.
+  #
+  # Parameters:
+  #   prefix: Create a temporary directory with the given prefix.
+
+  local IR
+  if [ $# -eq 0 ]; then
+    DIR=$(mktemp -d)
+  else
+    DIR=$(mktemp -d -t "${1}.XXXXXXXXXX")
+  fi
+  cd "$DIR" || exit
+}
+
+get_local_ips() {
+  # get_local_ips: Retrieve all local IP addresses of the current machine.
+  #
+  # This function uses the 'ip' command to extract all local IP addresses (IPv4
+  # and IPv6) configured on the machine, excluding loopback addresses.
+  #
+  # Usage:
+  #   - local_ips=($(get_local_ips))
+  #
+  # Returns:
+  #   An array containing all local IP addresses (IPv4 and IPv6).
+
+  local LOCAL_IPS
+
+  LOCAL_IPS=($(ifconfig | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}'))
+
+  if [ ${#LOCAL_IPS[@]} -eq 0 ]; then
+    _display_error "No local IP addresses found."
+  else
+    for ip in "${LOCAL_IPS[@]}"; do
+      echo "Local IP address: $ip"
+    done
+  fi
+}
+
+get_public_ip() {
+  # my_ip: Retrieve the public and local IP addresses of the current machine.
+  # This function uses 'curl' to fetch the public IP from 'icanhazip.com',
+  # and 'ip addr' to extract the local IP addresses, filtering out loopback
+  # and IPv6 addresses.
+  #
+  # Usage:
+  #   - public_ip=$(my_ip)          # Get the public IP address
+  #
+  # Returns:
+  #   Public IP address when called without arguments, or an array of local
+  #   IP addresses when called with 'local' as an argument.
+
+  local PUBLIC_IP
+  
+  PUBLIC_IP=$(wget -qO- --secure-protocol=auto https://icanhazip.com 2>/dev/null)
+
+  if [ $? -eq 0 ]; then
+    if [ -n "$PUBLIC_IP" ]; then
+      echo "Public IP address: $PUBLIC_IP"
+    else
+      _display_error "Empty response from the server."
+    fi
+  else
+    _display_error "Failed to retrieve the public IP address."
+  fi
+}
