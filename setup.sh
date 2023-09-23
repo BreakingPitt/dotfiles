@@ -1,10 +1,22 @@
-#!/bin/bash
+#!/bin/zsh
 
 set -o errexit
 set -o pipefail
 
-# Configuration Variables
 BREWFILE="./Brewfile"
+DOTFILES=(".ansible.cfg"
+          ".aws/config:.aws"
+          ".curlrc" 
+          ".gitattributes" 
+          ".gitconfig" 
+          ".gitconfig-personal" 
+          ".gitconfig-work" 
+          ".gitignore-global"
+          ".pylintrc"
+          ".screenrc"
+          ".ssh/config:.ssh"
+          ".wgetrc")
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 _detect_brew() {
   if ! command -v brew &> /dev/null; then
@@ -39,7 +51,6 @@ _display_beer() {
 
 _display_finish() {
   echo "🎉 $1"
-  echo " "
 }
 
 _display_install() {
@@ -52,15 +63,24 @@ _display_key() {
 
 _display_start() {
   echo "🏁 $1"
-  echo " "
 }
 
 _display_success() {
   success=true
-  echo "✅ $1"
+  echo -e "\t✅ $1"
 }
 
 _display_unsupported() {
+  success=false
+  echo -e "\t❌ $1"
+}
+
+_display_success_no_indent() {
+  success=true
+  echo "✅ $1"
+}
+
+_display_unsupported_no_indent() {
   success=false
   echo "❌ $1"
 }
@@ -73,15 +93,24 @@ _get_sudo_password() {
   fi
 }
 
-_homebrew_update_upgrade() {
-  _display_start "Updating Homebrew..."
-  brew update
+_homebrew_update() {
+   _display_start "Homebrew update process started..."
+   if brew update  > /dev/null; then
+     _display_success "Homebrew update process run successfully."
+     _display_finish  "Homebrew update process finished!"
+   else
+     _display_unsupported "There was an error updating Homebrew."
+   fi
+}
 
-  _display_start "Upgrading installed packages..."
-  brew upgrade
-
-  _display_start "Running 'brew doctor'..."
-  brew doctor
+_homebrew_upgrade() {
+   _display_start "Homebrew upgrade process started..."
+   if brew upgrade  > /dev/null; then
+     _display_success "Homebrew updgrade process run successfully."
+     _display_finish  "Homebrew updgrade process finished!"
+   else
+     _display_unsupported "There was an error updgrading Homebrew."
+   fi
 }
 
 _install_homebrew() {
@@ -107,6 +136,7 @@ _install_homebrew() {
          return
          ;;
      esac
+
      if ! _install_homebrew; then
        _display_unsupported "Failed to install Homebrew."
        return
@@ -117,16 +147,17 @@ _install_homebrew() {
 _install_oh_my_zsh() {
   if ! command -v omz &> /dev/null; then
     _display_install "Installing Oh My Zsh..."
-    if /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/HEAD/tools/install.sh)"  2>&1; then
-       _display_success "Oh My Zsh installation completed successfully."
-       return
+    if output=$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/HEAD/tools/install.sh 2>&1); then
+      if /bin/bash -c "$output"; then
+        _display_success "Oh My Zsh installation completed successfully."
+      else
+        _display_unsupported "Oh My Zsh installation failed."
+      fi
     else
-      _display_unsupported "Oh My Zsh installation failed."
-      return
+      _display_unsupported "Failed to fetch the Oh My Zsh installation script."
     fi
   else
     _display_success "Oh My Zsh is already installed."
-    return
   fi
 }
 
@@ -135,14 +166,13 @@ _install_packages_from_brewfile() {
   local PASSWORD="$2"
 
   if [ -f "$BREWFILE" ]; then
-    # Run brew bundle and capture its output
-    bundle_output=$(echo "$PASSWORD" |brew bundle --file="$BREWFILE" 2>&1)
+    _display_start "Brewfile package installing proccess started..."
+    bundle_output=$(echo "$PASSWORD" |brew bundle --file="$BREWFILE")
 
     # Check if brew bundle was successful
     if [ $? -eq 0 ]; then
-      _display_success "Brewfile packages installation completed successfully."
+      _display_success "Brewfile package installing proccess finished successfully!"
 
-      # Parse the captured output to extract installed package names
       while IFS= read -r line; do
         if [[ "$line" == "Installing"* ]]; then
           package_name="${line#Installing }"
@@ -177,17 +207,48 @@ _install_xcode_command_line_tools() {
   fi
 }
 
+_set_up_dot_files() {
+  _display_start "Dotfiles configuration process started..."
 
-_display_start "Starting installation process..."
+  errors=()
+
+  for dotfile in "${DOTFILES[@]}"; do
+    IFS=":" read -r NAME SUBDIR <<< "$dotfile"
+    SUBDIR="${SUBDIR:-}"
+    mkdir -p "$HOME/$SUBDIR"
+
+    if ln -sfn "$DOTFILES_DIR/$NAME" "$HOME/$NAME"; then
+      _display_success "Symbolic link for $NAME created."
+    else
+      errors+=("Failed to create symbolic link for $NAME.")
+    fi
+  done
+
+  if [ ${#errors[@]} -eq 0 ]; then
+    _display_finish "Dotfiles configuration process completed!"
+  else
+    _display_unsupported "Dotfiles installation completed with the following errors:"
+    for error in "${errors[@]}"; do
+      _display_unsupported "  - $error"
+    done
+  fi
+}
+
 _get_sudo_password
+_display_start "Bootstrap process started..."
 _install_xcode_command_line_tools
 _install_homebrew
+_homebrew_update
+_homebrew_upgrade
 _install_packages_from_brewfile  "$BREWFILE" "$PASSWORD"
-_install_oh_my_zsh
+#_install_oh_my_zsh
 
 if [ "$success" = true ]; then
-  _display_finish "Installation finished!"
+  _display_finish "Bootstrap process finisehd successfully!"
 else
-  _display_unsupported "Installation finished with errors."
+  _display_unsupported_no_indent "Bootstrap process finished with errors!"
 fi
+
+_set_up_dot_files
+
 
