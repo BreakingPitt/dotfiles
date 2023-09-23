@@ -6,40 +6,47 @@
 	status = true
 
 [core]
-        editor = vim
-        whitespace = fix,trailing-space,cr-at-eol
-        hooksPath = ~/.config/git/hooks
         commitGraph = true
+        editor = vim
+        excludesfile = ~/.gitignore-global
+        hooksPath = ~/.config/git/hooks
+        whitespace = fix,trailing-space,cr-at-eol
 
 [credential]
 	helper = cache --timeout=7200
 
 [diff]
         algorithm = myers
-	tool = vimdiff
 	colorMoved = default
-	renames = copy
 	mnemonicPrefix = true
-	wsErrorHighlight = all
+	renames = copy
+	tool = vimdiff
 	statGraphWidth = 40
+	wsErrorHighlight = all
 
 [init]
 	defaultBranch = main
 
 [status]
-	short = true
 	branch = true
+	renames = copy
+	short = true
 	showStash = true
 	submoduleSummary = true
-	renames = copy
 
 [url "https://github"]
-  insteadOf = git://github
+        insteadOf = git://github
 
 [user]
         name = Pedro Garcia Rodriguez
         email = pedgarrod@gmail.com
-        signingkey = pedgarrod@gmail.com
+        signingkey = 0879BC83C7979BFC
 
 [web]
 	browser = brave
+
+[includeIf "gitdir:~/Work/Code/Personal/"]
+  path = ~/.gitconfig-personal
+
+[includeIf "gitdir:~/Work/Code/Work/"]
+  path = ~/.gitconfig-work
