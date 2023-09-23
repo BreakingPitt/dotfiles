@@ -67,11 +67,22 @@ _display_unsupported() {
 
 _get_sudo_password() {
   _display_key "Enter your sudo password:"
-  read -s PASSWORD
+  read -s -r PASSWORD
   if [ -z "$PASSWORD" ]; then
     _display_unsupported "Sudo password is empty. Aborting."
   fi
+}
 
+_homebrew_update_upgrade() {
+  _display_start "Updating Homebrew..."
+  brew update
+
+  _display_start "Upgrading installed packages..."
+  brew upgrade
+
+  _display_start "Running 'brew doctor'..."
+  brew doctor
+}
 
 _install_homebrew() {
    if _detect_brew; then
@@ -84,20 +95,21 @@ _install_homebrew() {
        "osx")
          _display_install "Installing Homebrew for macOS..."
          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+         return
          ;;
        "linux")
          _display_install "Installing Homebrew for Linux..."
          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
-         ;;
+         return
+	 ;;
        *)
          _display_unsupported "Unsupported operating system: $OS. Homebrew installation aborted."
          return
          ;;
      esac
-     if _install_homebrew; then
-       _display_success "Homebrew has been successfully installed."
-     else
+     if ! _install_homebrew; then
        _display_unsupported "Failed to install Homebrew."
+       return
      fi
    fi
 }
@@ -105,13 +117,16 @@ _install_homebrew() {
 _install_oh_my_zsh() {
   if ! command -v omz &> /dev/null; then
     _display_install "Installing Oh My Zsh..."
-    if output=$( /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/HEAD/tools/install.sh)"  2>&1); then
-       _display_success "Oh My Zsh installation completed successfully."  
+    if /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/HEAD/tools/install.sh)"  2>&1; then
+       _display_success "Oh My Zsh installation completed successfully."
+       return
     else
       _display_unsupported "Oh My Zsh installation failed."
+      return
     fi
   else
     _display_success "Oh My Zsh is already installed."
+    return
   fi
 }
 
@@ -134,11 +149,14 @@ _install_packages_from_brewfile() {
           _display_success "$package_name Installed successfully"
         fi
       done <<< "$bundle_output"
+      return
     else
       _display_unsupported "Error during Brewfile installation. See the output below for details:"
+      return
     fi
   else
     _display_unsupported "Brewfile not found: $BREWFILE"
+    return
   fi
 }
 
@@ -148,11 +166,14 @@ _install_xcode_command_line_tools() {
     _display_start "Xcode Command Line Tools are not installed. Installing..."
     if xcode-select --install &> /dev/null; then
       _display_success "Xcode Command Line Tools installation started. Follow the on-screen prompts to complete the installation."
+      return
     else
       _display_unsupported "❌ Failed to initiate Xcode Command Line Tools installation."
+      return
     fi
   else
     _display_success "Xcode Command Line Tools are already installed."
+    return
   fi
 }
 
