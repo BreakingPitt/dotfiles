@@ -113,7 +113,7 @@ _homebrew_upgrade() {
    fi
 }
 
-_install_homebrew() {
+_homebrew_install() {
    if _detect_brew; then
      _display_success "Homebrew is already installed."
    else
@@ -171,7 +171,7 @@ _install_packages_from_brewfile() {
 
     # Check if brew bundle was successful
     if [ $? -eq 0 ]; then
-      _display_success "Brewfile package installing proccess finished successfully!"
+      _display_success "Brewfile package installing proccess run successfully!"
 
       while IFS= read -r line; do
         if [[ "$line" == "Installing"* ]]; then
@@ -179,7 +179,7 @@ _install_packages_from_brewfile() {
           _display_success "$package_name Installed successfully"
         fi
       done <<< "$bundle_output"
-      return
+      _display_finish  "Homebrew update process finished!"
     else
       _display_unsupported "Error during Brewfile installation. See the output below for details:"
       return
@@ -237,7 +237,7 @@ _set_up_dot_files() {
 _get_sudo_password
 _display_start "Bootstrap process started..."
 _install_xcode_command_line_tools
-_install_homebrew
+_homebrew_install
 _homebrew_update
 _homebrew_upgrade
 _install_packages_from_brewfile  "$BREWFILE" "$PASSWORD"
