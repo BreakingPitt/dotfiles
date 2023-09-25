@@ -7,6 +7,7 @@ BREWFILE="./Brewfile"
 DOTFILES=(".ansible.cfg"
           ".aws/config:.aws"
           ".curlrc" 
+          ".functions" 
           ".gitattributes" 
           ".gitconfig" 
           ".gitconfig-personal" 
@@ -207,6 +208,22 @@ _install_xcode_command_line_tools() {
   fi
 }
 
+_macos_software_update() {
+   local OS
+   OS="$(_detect_os)"
+   
+   if [ "$OS" = "osx" ]; then
+     _display_start "Running software update..."
+     if sudo softwareupdate -i -a; then
+       _display_success_no_indent "Software update completed successfully."
+     else
+       _display_unsupported_no_indent "Error running software update."
+     fi
+   else
+     _display_unsupported_no_indent "Software update is only supported on macOS."
+   fi
+}
+
 _set_up_dot_files() {
   _display_start "Dotfiles configuration process started..."
 
@@ -241,7 +258,8 @@ _homebrew_install
 _homebrew_update
 _homebrew_upgrade
 _install_packages_from_brewfile  "$BREWFILE" "$PASSWORD"
-#_install_oh_my_zsh
+_macos_software_update
+_install_oh_my_zsh
 
 if [ "$success" = true ]; then
   _display_finish "Bootstrap process finisehd successfully!"
