@@ -19,9 +19,15 @@ function create_gzip_file() {
 
   local file_path="$1"
   local gzip_file="${file_path}.gz"
+  local original_size
 
   if [ $# -ne 1 ]; then
-    echo "Usage: create_gzip_file <file_path>"
+    _display_error "Usage: create_gzip_file <file_path>"
+    return 1
+  fi
+
+  if [ ! -e "$file_path" ]; then
+    _display_error "Source file '$file_path' not found."
     return 1
   fi
 
@@ -30,10 +36,18 @@ function create_gzip_file() {
     return 1
   fi
 
+  original_size=$(wc -c < "$file_path")
+
   echo "Creating gzipped file: $gzip_file"
   gzip -c "$file_path" > "$gzip_file"
 
   if [ $? -eq 0 ]; then
+    # Get the gzipped file size
+    local gzipped_size
+    gzipped_size=$(wc -c < "$gzip_file")
+
+    echo "Original file size (bytes): $original_size"
+    echo "Gzipped file size (bytes): $gzipped_size"
     echo "Gzipped file created successfully."
   else
     _display_error "Error creating gzipped file."
@@ -41,21 +55,23 @@ function create_gzip_file() {
   fi
 }
 
-function create_tar_gz() {
-  # create_tar_gz - Create a tar.gz archive from a directory
+}
+
+function create_tar_gz_file() {
+  # create_tar_gz_file - Create a tar.gz archive from a directory
   #
   # This function creates a tar.gz archive from the specified source directory and
   # saves it to the specified output file.
   #
   # Usage:
-  #   create_tar_gz <source_directory> <output_file>
+  #   create_tar_gz_file <source_directory> <output_file>
   #
   # Arguments:
   #   - <source_directory>: The source directory to archive.
   #   - <output_file>: The name of the output tar.gz file to create.
   #
   # Example usage:
-  #   create_tar_gz ~/my_project /tmp/my_project.tar.gz
+  #   create_tar_gz_file ~/my_project /tmp/my_project.tar.gz
 
   local source_dir="$1"
   local output_file="$2"
