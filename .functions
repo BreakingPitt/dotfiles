@@ -55,8 +55,6 @@ function create_gzip_file() {
   fi
 }
 
-}
-
 function create_tar_gz_file() {
   # create_tar_gz_file - Create a tar.gz archive from a directory
   #
@@ -100,6 +98,40 @@ function create_tar_gz_file() {
     _display_error "Error creating tar.gz archive."
     return 1
   fi
+}
+
+function get_file_sizes() {
+  # file_sizes - Display the sizes of files and directories in the current directory.
+  #
+  # This function uses the 'du' command to calculate and display the sizes of files
+  # and directories in the current directory. It can also display sizes in human-
+  # readable format with options to handle different file sizes.
+  #
+  # Usage:
+  #   - To display sizes of files and directories in the current directory:
+  #     file_sizes
+  #   - To display the size of a specific file or directory:
+  #     file_sizes <file_or_directory> [<file_or_directory2> ...]
+  #
+  # Arguments:
+  #   - file_or_directory: Optional. The path(s) to the file(s) or directory(ies)
+  #                        you want to display the size of. If no argument is
+  #                        provided, sizes for all files and directories in the
+  #                        current directory are displayed.
+
+  local arg="-sh"
+
+  if du -b /dev/null > /dev/null 2>&1; then
+    arg="-sbh"  # Use human-readable sizes
+  fi
+
+  local target="*"
+
+  if [[ -n "$1" ]]; then
+    target=("$@")
+  fi
+
+  du "$arg" -- "${target[@]}"
 }
 
 function mk_dir() {
