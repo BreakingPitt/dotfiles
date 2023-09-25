@@ -5,16 +5,16 @@
         "revision": "2fd3fc28d679cf383bb8533b2294747bb8fa34b7"
       },
       "homebrew/cask": {
-        "revision": "63b97383541b6864ad665008126b49ba92124c1b"
+        "revision": "e97f72449a502a996c9e11ef47bcf8aa339032d5"
       },
       "homebrew/cask-fonts": {
-        "revision": "77a4a27c1fbdc87e0e3f3efeb7233527b1687908"
+        "revision": "6e69d926449a59537a5bcdf1aa5b503e8b92060a"
       },
       "homebrew/cask-versions": {
-        "revision": "475463d5cbb2c1a9664cce9a974807ffb54f5e1e"
+        "revision": "6fe5d86d314dff9e45d529e9ec436b2b41c693aa"
       },
       "homebrew/core": {
-        "revision": "350287d04fec605d86f58f2f382e1a8c778ced27"
+        "revision": "63c758ae2ee8e42eeb899ab6a50221f18ac1bb3c"
       },
       "homebrew/bundle": {
         "revision": "94906ca5e163030827764cae2c87602c54aef047"
@@ -1192,6 +1192,11 @@
           "rebuild": 0,
           "root_url": "https://ghcr.io/v2/homebrew/core",
           "files": {
+            "arm64_sonoma": {
+              "cellar": ":any",
+              "url": "https://ghcr.io/v2/homebrew/core/mtr/blobs/sha256:d1d03f6a4f9a9e49321d656b787d4e53f1f6acad08384d68bb4ad8199bf1626e",
+              "sha256": "d1d03f6a4f9a9e49321d656b787d4e53f1f6acad08384d68bb4ad8199bf1626e"
+            },
             "arm64_ventura": {
               "cellar": ":any",
               "url": "https://ghcr.io/v2/homebrew/core/mtr/blobs/sha256:83d9da1de6a03855e99e0db1f8060f196fda988b187493aaad8d15b039176644",
@@ -1206,6 +1211,11 @@
               "cellar": ":any",
               "url": "https://ghcr.io/v2/homebrew/core/mtr/blobs/sha256:0e41037f1e0f662b87155307468c740594d2e16761e2b120a3086e0922c7bda5",
               "sha256": "0e41037f1e0f662b87155307468c740594d2e16761e2b120a3086e0922c7bda5"
+            },
+            "sonoma": {
+              "cellar": ":any",
+              "url": "https://ghcr.io/v2/homebrew/core/mtr/blobs/sha256:fad686ff163def04ca773130a81921c8498606f072ff7af37c62463e8aaf5412",
+              "sha256": "fad686ff163def04ca773130a81921c8498606f072ff7af37c62463e8aaf5412"
             },
             "ventura": {
               "cellar": ":any",
