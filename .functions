@@ -72,8 +72,13 @@ function create_tar_gz() {
 
   echo "Creating tar.gz archive from '$source_dir'..."
 
+  original_size=$(du -sh "$source_dir" | awk '{print $1}')
+
   if tar czf "$output_file" -C "$source_dir" .; then
+    compressed_size=$(du -sh "$output_file" | awk '{print $1}')
     echo "Tar.gz archive created successfully: $output_file"
+    echo "Original size: $original_size"
+    echo "Compressed size: $compressed_size"
     return 0
   else
     _display_error "Error creating tar.gz archive."
