@@ -30,7 +30,6 @@
 [status]
 	branch = true
 	renames = copy
-	short = true
 	showStash = true
 	submoduleSummary = true
 
