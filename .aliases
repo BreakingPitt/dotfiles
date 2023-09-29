@@ -1,8 +1,17 @@
-# Copy file interactive.
+# Git - Nuke repository changes.
+alias git_nuke='git clean -df && git reset --hard'
+
+# Shell - Copy file interactive.
 alias cp='cp -i'
 
-# Move file interactive.
+# Shell - Move file interactive.
 alias mv='mv -i'
+
+# Shell - Print each PATH entry on a separate line.
+alias path='echo -e ${PATH//:/\\n}'
+
+# Shell - Reload shell.
+alias reload='exec ${SHELL} -l'
 
 # Tar - Create & compress .TAR file.
 alias tar='tar cvf'
@@ -15,8 +24,3 @@ alias untar='tar xvf'
 
 # Tar - Uncompress .ZIP file.
 alias untar='tar xvzf'
-
-# Git - Nuke repository changes.
-alias git_nuke="git clean -df && git reset --hard"
-
-
