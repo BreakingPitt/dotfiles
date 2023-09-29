@@ -1,0 +1,22 @@
+# Copy file interactive.
+alias cp='cp -i'
+
+# Move file interactive.
+alias mv='mv -i'
+
+# Tar - Create & compress .TAR file.
+alias tar='tar cvf'
+
+# Tar - Create & compress .ZIP file.
+alias untar='tar cvzf'
+
+# Tar - Uncompress .TAR file.
+alias untar='tar xvf'
+
+# Tar - Uncompress .ZIP file.
+alias untar='tar xvzf'
+
+# Git - Nuke repository changes.
+alias git_nuke="git clean -df && git reset --hard"
+
+
