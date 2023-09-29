@@ -134,49 +134,38 @@ function get_file_sizes() {
   du "$arg" -- "${target[@]}"
 }
 
-function mk_dir() {
-  # mk_dir: Create a directory and change to it.
+function get_gzip_size() {
+  # create_gzip_file - Create a gzipped (.gz) version of a file
   #
-  # This function creates a directory with 'mkdir -p' and then changes to it using 'cd'.
-  # It checks if the directory creation was successful before attempting to change to it.
+  # This function takes the path to a file as an argument and creates a gzipped version
+  # of that file with the same name and a '.gz' extension. It performs error checking to
+  # ensure that the file exists, that a gzipped version doesn't already exist, and
+  # reports the outcome of the gzipping process.
   #
   # Usage:
-  #   - mk_dir directory_path
+  #   create_gzip_file <file_path>
   #
-  # Parameters:
-  #   directory_path: The path to the directory to be created and changed to.
+  # Arguments:
+  #   - <file_path>: The path to the file you want to gzip.
 
-  local DIRECTORY_PATH="$1"
+  local original_size
+  local gzipped_size
 
-  if mkdir -p "$DIRECTORY_PATH"; then
-    cd "$DIRECTORY_PATH" || return 1
-  else
+  if [ -z "$1" ]; then
+    _display_error "No input file provided."
     return 1
   fi
-}
 
-function mk_tempd() {
-  # mk_tempd: Create a temporary directory and change the current working directory to it.
-  #
-  # This function generates a temporary directory using 'mktemp' and optionally
-  # appends a provided prefix to the directory name. It then changes the current
-  # working directory to the newly created directory.
-  #
-  # Usage:
-  #   - Without arguments: Create a temporary directory with a random name.
-  #   - With a prefix argument: Create a temporary directory with the given prefix.
-  #
-  # Parameters:
-  #   prefix: Create a temporary directory with the given prefix.
-
-  local DIR
-
-  if [ $# -eq 0 ]; then
-    DIR=$(mktemp -d)
-  else
-    DIR=$(mktemp -d -t "${1}.XXXXXXXXXX")
+  if ! [ -f "$1" ]; then
+    _display_error "File '$1' not found."
+    return 1
   fi
-  cd "$DIR" || exit
+
+  original_size=$(wc -c < "$1")
+  gzipped_size=$(gzip -c "$1" | wc -c)
+
+  echo "Original size (bytes): $original_size"
+  echo "Gzipped size (bytes): $gzipped_size"
 }
 
 function get_local_ips() {
@@ -311,4 +300,92 @@ function get_gzip_size() {
 
   echo "Original size (bytes): $original_size"
   echo "Gzipped size (bytes): $gzipped_size"
+}
+
+function mk_dir() {
+  # mk_dir: Create a directory and change to it.
+  #
+  # This function creates a directory with 'mkdir -p' and then changes to it using 'cd'.
+  # It checks if the directory creation was successful before attempting to change to it.
+  #
+  # Usage:
+  #   - mk_dir directory_path
+  #
+  # Parameters:
+  #   directory_path: The path to the directory to be created and changed to.
+
+  local DIRECTORY_PATH="$1"
+
+  if mkdir -p "$DIRECTORY_PATH"; then
+    cd "$DIRECTORY_PATH" || return 1
+  else
+    return 1
+  fi
+}
+
+function mk_tempd() {
+  # mk_tempd: Create a temporary directory and change the current working directory to it.
+  #
+  # This function generates a temporary directory using 'mktemp' and optionally
+  # appends a provided prefix to the directory name. It then changes the current
+  # working directory to the newly created directory.
+  #
+  # Usage:
+  #   - Without arguments: Create a temporary directory with a random name.
+  #   - With a prefix argument: Create a temporary directory with the given prefix.
+  #
+  # Parameters:
+  #   prefix: Create a temporary directory with the given prefix.
+
+  local DIR
+
+  if [ $# -eq 0 ]; then
+    DIR=$(mktemp -d)
+  else
+    DIR=$(mktemp -d -t "${1}.XXXXXXXXXX")
+  fi
+  cd "$DIR" || exit
+}
+
+function pb_copy() {
+  # pb_copy - Copy content from standard input to the clipboard.
+  #
+  # This function checks if 'pbcopy' is available and uses it to copy
+  # the content to the clipboard. If 'pbcopy' is not available, it
+  # falls back to using 'xclip'. Useful for easily copying content
+  # to the clipboard in a cross-platform manner.
+  #
+  # Usage:
+  #   echo "Hello, clipboard!" | pb_copy
+  #
+  
+  stdin=$(</dev/stdin);
+  pbcopy="$(which pbcopy)";
+
+  if [[ -n "$pbcopy" ]]; then
+    echo "$stdin" | "$pbcopy"
+  else
+    echo "$stdin" | xclip -selection clipboard
+  fi
+}
+
+function pb_paste() {
+  # pb_paste - Paste content from the clipboard to standard output.
+  #
+  # This function checks if 'pbpaste' is available and uses it to paste
+  # the content from the clipboard to standard output. If 'pbpaste' is
+  # not available, it falls back to using 'xclip'. Useful for easily
+  # pasting content from the clipboard in a cross-platform manner.
+  #
+  # Example usage:
+  #   pb_paste > output.txt
+  #
+
+  pbpaste="$(which pbpaste)";
+
+  if [[ -n "$pbpaste" ]]; then
+   "$pbpaste"
+  else
+   xclip -selection clipboard
+  fi
 }
