@@ -146,6 +146,15 @@ systemsetup -settimezone "Europe/Madrid" > /dev/null
 # General - Show battery percentage.
 defaults write com.apple.menuextra.battery ShowPercent -string "YES"
 
+# TextEdit - Use plain text mode for new TextEdit documents.
+defaults write com.apple.TextEdit RichText -int 0
+
+# TextEdit - Open files as UTF-8 in TextEdit.
+defaults write com.apple.TextEdit PlainTextEncoding -int 4
+
+# TextEdit - Save files as UTF-8 in TextEdit.
+defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
+
 # Iterm2 - # Don’t display prompt when quitting iTerm2.
 defaults write com.googlecode.iterm2 PromptOnQuit -bool false
 
