@@ -16,6 +16,8 @@ defaults write com.apple.ActivityMonitor ShowCategory -int 0
 
 # Activity Monitor - Sort Activity Monitor results by CPU usage.
 defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"
+
+# Activity Monitor - Sort Activity Monitor results in desc order.
 defaults write com.apple.ActivityMonitor SortDirection -int 0
 
 # General - Automatically quit printer app once the print jobs complete.
@@ -23,6 +25,9 @@ defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
 # General - Avoid creating .DS_Store files on network volumes.
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+
+# General - Avoid creating .DS_Store files on USB volumes.
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 
 # Dock - Disable Dock magnification
 defaults write com.apple.dock magnification -bool false
