@@ -5,7 +5,7 @@
         "revision": "898bebb82591b36ba8720ac28f1870c221390c1c"
       },
       "homebrew/cask": {
-        "revision": "cdd11a33ed329422c99b17f9482d06174bfc8bef"
+        "revision": "36648445bb7822158fca3567662b3c4e7b7ebc6b"
       },
       "homebrew/cask-fonts": {
         "revision": "81bf750832ccb8bb6eda9372b6250603d1932b23"
@@ -14,7 +14,7 @@
         "revision": "496c9e874904bfa3b6d5988d2abb90fb29857f99"
       },
       "homebrew/core": {
-        "revision": "7e563a6916662bec98d9a097a3b58235278cecfc"
+        "revision": "085e60e5ae8fee42007226fa108fd56f68bb8c72"
       },
       "homebrew/bundle": {
         "revision": "2b24ca760710ef2fe92c6d295dc2813cdb0b166a"
@@ -423,7 +423,7 @@
         "bottle": false
       },
       "hashicorp/tap/terraform": {
-        "version": "1.5.7",
+        "version": "1.6.0",
         "bottle": false
       },
       "lazydocker": {
