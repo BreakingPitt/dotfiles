@@ -1,8 +1,8 @@
 # Github - Personal dotfiles repository.
-git@github.com:BreakingPitt/dotfiles.git
+git@github.com:BreakingPitt/dotfiles.git:personal
 
 # Github - Terraform Packer vpc module repository.
-git@github.com:BreakingPitt/terraform-packer-vpc-module.git
+git@github.com:BreakingPitt/terraform-packer-vpc-module.git:personal
 
 # Github - Terraform Jitsy on ECS Fargate repository.
-git@github.com:BreakingPitt/jitsi-ecs-fargate.git
+git@github.com:BreakingPitt/jitsi-ecs-fargate.git:personal
