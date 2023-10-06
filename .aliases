@@ -2,10 +2,13 @@
 alias git_nuke='git clean -df && git reset --hard'
 
 # Shell - Copy SSH publick key to clipboard.
-alias copy_ssh_pub_key="pbcopy < $HOME/.ssh/id_ed25519.pub"
+alias copy_ssh_pub_key='pbcopy < $HOME/.ssh/id_ed25519.pub'
 
 # Shell - Copy file interactive.
 alias cp='cp -i'
+
+# Shell - Delete .DS_Store files on current directory.
+alias rm_ds_store='find . -name ".DS_Store" -type f -delete'
 
 # Shell - Move file interactive.
 alias mv='mv -i'
