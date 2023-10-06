@@ -140,9 +140,6 @@ sudo scutil --set HostName "Converge"
 sudo scutil --set LocalHostName "Converge"
 sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "Converge"
 
-# General - Set the timezone; see `systemsetup -listtimezones` for other values.
-systemsetup -settimezone "Europe/Madrid" 1>/dev/null 2>&1
-
 # General - Show battery percentage.
 defaults write com.apple.menuextra.battery ShowPercent -string "YES"
 
