@@ -1,164 +1,164 @@
-#!/bin/zsh
+#!/bin/bash
 
 set -o errexit
 set -o pipefail
 
+# Define script-level variables
 BREWFILE="./Brewfile"
-DOTFILES=(".ansible.cfg"
+DOTFILES=(".aliases"
+          ".ansible.cfg"
           ".aws/config:.aws"
-          ".curlrc" 
-          ".functions" 
-          ".gitattributes" 
-          ".gitconfig" 
-          ".gitconfig-personal" 
-          ".gitconfig-work" 
+          ".curlrc"
+          ".functions"
+          ".gitattributes"
+          ".gitconfig"
+          ".gitconfig-personal"
+          ".gitconfig-work"
           ".gitignore-global"
+          ".gnupg/gpg-agent.conf:.gnupg"
+          ".gnupg/gpg.conf:.gnupg"
           ".pylintrc"
           ".screenrc"
           ".ssh/config:.ssh"
           ".wgetrc")
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Helper function to detect if Homebrew is installed
 _detect_brew() {
-  if ! command -v brew &> /dev/null; then
-    return 1
-  else
-    return 0
-  fi
+  command -v brew &> /dev/null
 }
 
+# Helper function to detect the operating system
 _detect_os() {
-  declare -r OS_NAME="$(uname -s)"
-  local OS=""
-
-  case "$OS_NAME" in
-      "Darwin")
-          OS="osx"
-          ;;
-      "Linux")
-          OS="linux"
-          ;;
-      *)
-          OS="unknown"
-          ;;
+  case "$(uname -s)" in
+    "Darwin") echo "osx" ;;
+    "Linux") echo "linux" ;;
+    *) echo "unknown" ;;
   esac
-
-  printf "%s" "$OS"
 }
 
-_display_beer() {
-  echo "🍺 $1"
-}
+_display_message() {
+  local message="$1"
+  local in_progress="$2"
+  local success="$3"
+  local num_tabs="$4"
 
-_display_finish() {
-  echo "🎉 $1"
-}
+  local color_start="\033[0;37m"  # White color
+  local color_end="\033[0m"  # Reset color
 
-_display_install() {
-  echo "⚙️  $1"
-}
+  local indentation=""
+  for ((i = 0; i < num_tabs; i++)); do
+    indentation+="\t"  # Add tabs based on the provided number
+  done
 
-_display_key() {
-  echo "🔑 $1"
-}
+  if [ "$in_progress" = true ]; then
+    indentation+="\t"  # Add one additional tab for in-progress messages
+  elif [ "$success" = true ]; then
+    indentation+="\t"  # Add one additional tab for regular success messages
+  fi
 
-_display_start() {
-  echo "🏁 $1"
-}
+  if [ "$success" = false ]; then
+    local status="[KO]"
+    local status_color="\033[0;31m"  # Red color for failure
+  else
+    local status="[OK]"
+    local status_color="\033[0;32m"  # Green color for success
+  fi
 
-_display_success() {
-  success=true
-  echo -e "\t✅ $1"
-}
-
-_display_unsupported() {
-  success=false
-  echo -e "\t❌ $1"
-}
-
-_display_success_no_indent() {
-  success=true
-  echo "✅ $1"
-}
-
-_display_unsupported_no_indent() {
-  success=false
-  echo "❌ $1"
+  echo -e "${color_start}${indentation}$message ${status_color}$status${color_end}"
 }
 
 _get_sudo_password() {
-  _display_key "Enter your sudo password:"
-  read -s -r PASSWORD
-  if [ -z "$PASSWORD" ]; then
-    _display_unsupported "Sudo password is empty. Aborting."
+  local password_required=false
+  local OS
+
+  OS="$(_detect_os)"
+
+  if [ "$OS" = "osx" ]; then
+    password_required=true
+  fi
+
+  if [ "$password_required" = true ]; then
+    echo "Enter your sudo password:"
+    read -s -r PASSWORD
+    if [ -z "$PASSWORD" ]; then
+      echo "Sudo password is empty... Aborting."
+      exit 1
+    fi
+  fi
+}
+
+_homebrew_clean_up() {
+  if brew cleanup > /dev/null 2>&1; then
+    _display_message "HomeBrew cleanup completed successfully." false true 1
+  else
+    _display_message "Error during HomeBrew cleanup." false true 1
   fi
 }
 
 _homebrew_update() {
-   _display_start "Homebrew update process started..."
-   if brew update  > /dev/null; then
-     _display_success "Homebrew update process run successfully."
-     _display_finish  "Homebrew update process finished!"
-   else
-     _display_unsupported "There was an error updating Homebrew."
-   fi
+  if brew update > /dev/null 2>&1; then
+    _display_message "HomeBrew update completed successfully." false true 1
+  else
+    _display_message "Error updating HomeBrew." false true 1
+  fi
 }
 
 _homebrew_upgrade() {
-   _display_start "Homebrew upgrade process started..."
-   if brew upgrade  > /dev/null; then
-     _display_success "Homebrew updgrade process run successfully."
-     _display_finish  "Homebrew updgrade process finished!"
-   else
-     _display_unsupported "There was an error updgrading Homebrew."
-   fi
+  if brew upgrade > /dev/null 2>&1; then
+    _display_message "HomeBrew upgrade completed successfully." false true 1
+  else
+    _display_message "Error upgrading HomeBrew packages." false true 1
+  fi
 }
 
 _homebrew_install() {
-   if _detect_brew; then
-     _display_success "Homebrew is already installed."
-   else
-     local OS
-     OS="$(detect_operating_system)"
+  if _detect_brew; then
+    _display_message "HomeBrew is already installed." false true 2
+  else
+    local OS
+    OS="$(_detect_os)"
+    local install_message
 
-     case "$OS" in
-       "osx")
-         _display_install "Installing Homebrew for macOS..."
-         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-         return
-         ;;
-       "linux")
-         _display_install "Installing Homebrew for Linux..."
-         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
-         return
-	 ;;
-       *)
-         _display_unsupported "Unsupported operating system: $OS. Homebrew installation aborted."
-         return
-         ;;
-     esac
+    case "$OS" in
+      "osx")
+        install_message="Installing HomeBrew for macOS..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        ;;
+      "linux")
+        install_message="Installing HomeBrew for Linux..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
+        ;;
+      *)
+        _display_message "Unsupported operating system: $OS. HomeBrew installation aborted." false true 2
+        exit 1
+        ;;
+    esac
 
-     if ! _install_homebrew; then
-       _display_unsupported "Failed to install Homebrew."
-       return
-     fi
-   fi
+    if ! _detect_brew; then
+      _display_message "Failed to install HomeBrew." false true 2
+      exit 1
+    fi
+
+    _display_message "$install_message" false true 1
+  fi
 }
 
 _install_oh_my_zsh() {
-  if ! command -v omz &> /dev/null; then
-    _display_install "Installing Oh My Zsh..."
-    if output=$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/HEAD/tools/install.sh 2>&1); then
-      if /bin/bash -c "$output"; then
-        _display_success "Oh My Zsh installation completed successfully."
-      else
-        _display_unsupported "Oh My Zsh installation failed."
-      fi
-    else
-      _display_unsupported "Failed to fetch the Oh My Zsh installation script."
-    fi
+  if command -v omz &> /dev/null; then
+    _display_message "Oh My Zsh is already installed." false true 2
+    return
+  fi
+
+  _display_message "Installing Oh My Zsh..." false true 1
+  local install_script_url="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
+
+  sh -c "$(curl -fsSL "$install_script_url")" "" --unattended
+
+  if [ $? -eq 0 ]; then
+    _display_message "Oh My Zsh installation completed successfully." false true 1
   else
-    _display_success "Oh My Zsh is already installed."
+    _display_message "Oh My Zsh installation failed." false true 1
   fi
 }
 
@@ -167,66 +167,58 @@ _install_packages_from_brewfile() {
   local PASSWORD="$2"
 
   if [ -f "$BREWFILE" ]; then
-    _display_start "Brewfile package installing proccess started..."
-    bundle_output=$(echo "$PASSWORD" |brew bundle --file="$BREWFILE")
+    bundle_output=$(echo "$PASSWORD" | brew bundle --file="$BREWFILE" --verbose)
 
-    # Check if brew bundle was successful
     if [ $? -eq 0 ]; then
-      _display_success "Brewfile package installing proccess run successfully!"
-
       while IFS= read -r line; do
         if [[ "$line" == "Installing"* ]]; then
           package_name="${line#Installing }"
-          _display_success "$package_name Installed successfully"
+          _display_message "$package_name installed successfully." false true 1
         fi
       done <<< "$bundle_output"
-      _display_finish  "Homebrew update process finished!"
+
+      _display_message "Brewfile packages installation completed successfully!" false true 2
     else
-      _display_unsupported "Error during Brewfile installation. See the output below for details:"
-      return
+      _display_message "Error during Brewfile installation. See the output below for details:" false true 2
+      echo "$bundle_output"
     fi
   else
-    _display_unsupported "Brewfile not found: $BREWFILE"
-    return
+    _display_message "Brewfile not found: $BREWFILE" false true 2
   fi
 }
-
 
 _install_xcode_command_line_tools() {
-  if ! xcode-select -p &> /dev/null; then
-    _display_start "Xcode Command Line Tools are not installed. Installing..."
-    if xcode-select --install &> /dev/null; then
-      _display_success "Xcode Command Line Tools installation started. Follow the on-screen prompts to complete the installation."
-      return
+  if ! (xcode-select -p > /dev/null 2>&1); then
+    _display_message "Installing Xcode Command Line Tools..." true true 1
+    if (xcode-select --install > /dev/null 2>&1); then
+      _display_message "Xcode Command Line Tools installed successfully." false true 1
     else
-      _display_unsupported "❌ Failed to initiate Xcode Command Line Tools installation."
-      return
+      _display_message "Failed to initiate Xcode Command Line Tools installation." false false 1
+      exit 1
     fi
   else
-    _display_success "Xcode Command Line Tools are already installed."
-    return
+    _display_message "Xcode Command Line Tools are already installed." false true 1
   fi
 }
 
-_macos_software_update() {
-   local OS
-   OS="$(_detect_os)"
-   
-   if [ "$OS" = "osx" ]; then
-     _display_start "Running software update..."
-     if sudo softwareupdate -i -a; then
-       _display_success_no_indent "Software update completed successfully."
-     else
-       _display_unsupported_no_indent "Error running software update."
-     fi
-   else
-     _display_unsupported_no_indent "Software update is only supported on macOS."
-   fi
+_install_macos_updates() {
+  local PASSWORD="$1"
+  local OS
+  OS="$(_detect_os)"
+
+  if [ "$OS" = "osx" ]; then
+    software_update_output=$(echo "$PASSWORD" | sudo -S softwareupdate -i -a > /dev/null 2>&1)
+    if [ $? -eq 0 ]; then
+      _display_message "macOS Software updates completed successfully." false true 1
+    else
+      _display_message "Error running macOS software updates." false true 1
+    fi
+  else
+    _display_message "Software updates are only supported on macOS." false true 1
+  fi
 }
 
 _set_up_dot_files() {
-  _display_start "Dotfiles configuration process started..."
-
   errors=()
 
   for dotfile in "${DOTFILES[@]}"; do
@@ -235,38 +227,81 @@ _set_up_dot_files() {
     mkdir -p "$HOME/$SUBDIR"
 
     if ln -sfn "$DOTFILES_DIR/$NAME" "$HOME/$NAME"; then
-      _display_success "Symbolic link for $NAME created."
+      _display_message "Symbolic link for $NAME created." false true 1
     else
       errors+=("Failed to create symbolic link for $NAME.")
     fi
   done
 
-  if [ ${#errors[@]} -eq 0 ]; then
-    _display_finish "Dotfiles configuration process completed!"
-  else
-    _display_unsupported "Dotfiles installation completed with the following errors:"
+  if [ ${#errors[@]} -ne 0 ]; then
+    _display_message "Dotfiles installation completed with the following errors:" false true 1
     for error in "${errors[@]}"; do
-      _display_unsupported "  - $error"
+      _display_message "- $error" false true 1
     done
+  else
+    _display_message "Dotfiles installation completed successfully!" false true 0
   fi
 }
 
+_bootstrap_process() {
+
+  local xcode_tools_checked=false
+
+  _display_message "Pre-flight checks processes started..." true true 0
+
+  if ! (xcode-select -p > /dev/null 2>&1); then
+    _display_message "Installing Xcode Command Line Tools..." true true 1
+    if (xcode-select --install > /dev/null 2>&1); then
+      _display_message "Xcode Command Line Tools installed successfully." false true 1
+    else
+      _display_message "Failed to initiate Xcode Command Line Tools installation." false false 1
+      return 1
+    fi
+    xcode_tools_checked=true
+  else
+    _display_message "Xcode Command Line Tools are already installed." false true 1
+  fi
+
+  if _detect_brew; then
+    _display_message "HomeBrew is already installed." false true 1
+  else
+    if _homebrew_install; then
+      _display_message "HomeBrew installed successfully." false true 1
+    else
+      _display_message "Error installing HomeBrew." false false 1
+      return 1
+    fi
+  fi
+
+  _display_message "HomeBrew maintenance process started..." true true 0
+  _homebrew_update
+  _homebrew_upgrade
+  _homebrew_clean_up
+
+  if [ "$xcode_tools_checked" = true ]; then
+    _display_message "HomeBrew package install process started..." true true 0
+    _install_packages_from_brewfile "$BREWFILE" "$PASSWORD"
+  fi
+
+  #if ! command -v omz &> /dev/null; then
+  #  _install_oh_my_zsh
+  #else
+  #  _display_message "Oh My Zsh is already installed." false true 1
+  #fi
+
+  _display_message "Setting up dotfiles process started..." true true 0
+  _set_up_dot_files
+
+  _display_message "Setting up mac OS preferences process started..." true true 0
+  source ./macos.sh
+  _display_message "Setting up mac OS preferences process finished succesfully..." true true 0
+}
+
 _get_sudo_password
-_display_start "Bootstrap process started..."
-_install_xcode_command_line_tools
-_homebrew_install
-_homebrew_update
-_homebrew_upgrade
-_install_packages_from_brewfile  "$BREWFILE" "$PASSWORD"
-_macos_software_update
-_install_oh_my_zsh
 
-if [ "$success" = true ]; then
-  _display_finish "Bootstrap process finisehd successfully!"
-else
-  _display_unsupported_no_indent "Bootstrap process finished with errors!"
-fi
+echo -e "--- Bootstrap Process ---"
 
-_set_up_dot_files
+_bootstrap_process
 
+echo -e "--- Bootstrap Process Completed Successfully ---"
 
