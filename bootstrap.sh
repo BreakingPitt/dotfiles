@@ -293,8 +293,22 @@ _bootstrap_process() {
   _set_up_dot_files
 
   _display_message "Setting up mac OS preferences process started..." true true 0
-  source ./macos.sh
+  if [ -f "macos.sh" ]; then
+    source "macos.sh"
+  else
+    _display_message "Warning: macos.sh file not found."
+    exit 1
+  fi 
   _display_message "Setting up mac OS preferences process finished succesfully..." true true 0
+
+  _display_message "Setting up aliases.." true true 0
+  if [ -f "$HOME/.aliases" ]; then
+    source "$HOME/.aliases"
+  else
+    _display_message "Warning: .aliases file not found."
+    exit 1
+  fi
+  _display_message "Setting up aliases process finished succesfully..." true true 0
 }
 
 _get_sudo_password
