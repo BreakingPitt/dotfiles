@@ -1,0 +1,54 @@
+# Docker - List all running containers. 
+alias dps='docker ps'
+
+# Docker - List all containers, including stopped ones.
+alias dpsa='docker ps -a'
+
+# Docker - Start a stopped container.
+alias dstart='docker start'
+
+# Docker - Stop a running container.
+alias dstop='docker stop'
+
+# Docker - Restart a container.
+alias drestart='docker restart'
+
+# Docker - Remove a stopped container.
+alias drm='docker rm'
+
+# Docker - Forcefully remove a running container.
+alias drmforce='docker rm -f'
+
+# Docker - List all Docker images.
+alias dimages='docker images'
+
+# Docker - Remove a Docker image.
+alias drmimg='docker rmi'
+
+# Docker - Remove all images without associated containers.
+alias dip='docker image prune'
+
+# Docker - List all Docker networks.
+alias dnetls='docker network ls'
+
+# Docker - Show details about a specific network.
+alias dnetinspect='docker network inspect'
+
+# Docker - List all Docker volumes.
+alias dvolumels='docker volume ls'
+
+# Docker - Show details about a specific volume.
+alias dvolumeinspect='docker volume inspect'
+
+# Docker - Execute a command inside a running container.
+alias dexec='docker exec -it'
+
+# Docker - Show the logs of a container.
+alias dlogs='docker logs'
+
+# Docker - Start the services defined in a docker-compose.yml file.
+alias dcomposeup='docker compose up'
+
+# Docker - Stop and remove the containers defined in a docker-compose.yml file.
+alias dcomposedown='docker compose down'
+
