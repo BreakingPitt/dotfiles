@@ -2,7 +2,7 @@
 # Brewfile
 #
 # Maintained by Pedro Garcia Rodriguez <me@pgarcia.es>
-# http://www.pgarcia.es/
+# Website: http://www.pgarcia.es/
 
 cask_args appdir: "/Applications"
 
