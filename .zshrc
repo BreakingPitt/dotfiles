@@ -1,111 +1,70 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
 
-# Path to your oh-my-zsh installation.
+# Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-# Path to the TTY device for the current interactive shell.
-export GPG_TTY=$(tty)
-
-# Set the LC_ALL environment variable to en_US.UTF-8 for locale settings
+# Set the LC_ALL environment variable to en_US.UTF-8 for locale settings.
 export LC_ALL=en_US.UTF-8
 
-# Set the LANG environment variable to en_US.UTF-8 for language settings
+# Set the LANG environment variable to en_US.UTF-8 for language settings.
 export LANG=en_US.UTF-8
 
-# load a random theme each time oh-my-zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+# Sets the GPG_TTY environment variable to use the current terminal for GPG interaction.
+export GPG_TTY=$(tty)
+
+# Limit the number of commands kept in memory to 10,000.
+HISTSIZE=10000
+
+# Set the maximum number of commands to store in the history file to 100,000.
+SAVEHIST=100000
+
+# Define the file location for saving the Zsh history.
+HISTFILE="$HOME/.zsh_history"
+
+# Ignore duplicate commands, but keep the last occurrence.
+setopt histignorealldups
+
+# Share the command history across all open Zsh sessions.
+setopt sharehistory
+
+# Automatically change directories when a directory name is typed as a command.
+setopt autocd
+
+# Allow prompt substitution, required for Git plugin to display branch info.
+setopt promptsubst
+
+# Auto update oh-my-zsh.
+zstyle ':omz:update' mode auto
+zstyle ':omz:update' frequency 1
+
+# Display red dots whilst waiting for completion.
+COMPLETION_WAITING_DOTS="true"
+
+# ZSH plugins.
+plugins=(git git-prompt zsh-bat)
+
+# ZSH theme.
 ZSH_THEME="agnoster"
 
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
-
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(ansible aws brew docker docker-machine macos sudo terraform torrent)
-
+# Load oh-my-zsh.
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
+# Load the fuck.
+eval $(thefuck --alias)
 
-# export MANPATH="/usr/local/man:$MANPATH"
+if type brew &>/dev/null; then
+    FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
 
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
+    autoload -Uz compinit
+    compinit
+fi
 
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
+# Load ZSH auto suggestions.
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+# Load ZSH syntax highlighting.
+source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-
-# Initialize the Starship prompt for Zsh shell
-eval "$(starship init zsh)"
-
+# Load aliases from a separate file
+if [[ -f ~/.zsh_aliases ]]; then
+  source ~/.zsh_aliases
+fi
