@@ -20,11 +20,32 @@ SAVEHIST=100000
 # Define the file location for saving the Zsh history.
 HISTFILE="$HOME/.zsh_history"
 
+# Record timestamp in history.
+setopt EXTENDED_HISTORY
+
+# Expire duplicate entries first when trimming history
+setopt HIST_EXPIRE_DUPS_FIRST
+
+# Don't display a line previously found.
+setopt HIST_FIND_NO_DUPS
+
 # Ignore duplicate commands, but keep the last occurrence.
-setopt histignorealldups
+setopt HIST_IGNORE_ALL_DUPS
+
+# Don't display a line previously found.
+setopt HIST_IGNORE_DUPS
+
+# Don't record an entry starting with a space.
+setopt HIST_IGNORE_SPACE
+
+# Don't write duplicate entries in the history file.
+setopt HIST_SAVE_NO_DUPS
+
+# Immediately append to history file.
+setopt INC_APPEND_HISTORY
 
 # Share the command history across all open Zsh sessions.
-setopt sharehistory
+setopt SHARE_HISTORY
 
 # Automatically change directories when a directory name is typed as a command.
 setopt autocd
