@@ -43,7 +43,7 @@ COMPLETION_WAITING_DOTS="true"
 plugins=(git git-prompt zsh-bat)
 
 # ZSH theme.
-ZSH_THEME="agnoster"
+ZSH_THEME="dracula"
 
 # Load oh-my-zsh.
 source $ZSH/oh-my-zsh.sh
